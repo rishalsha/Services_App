@@ -78,7 +78,7 @@ class _ServicesAppState extends State<ServicesApp> with WidgetsBindingObserver, 
       navigatorKey: _navKey,
       title: 'Services',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo, brightness: Brightness.dark),
         useMaterial3: true,
       ),
       home: ValueListenableBuilder<bool>(

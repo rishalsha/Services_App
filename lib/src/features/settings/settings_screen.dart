@@ -45,7 +45,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             segments: const [
               ButtonSegment(value: LockType.pin, label: Text('PIN')),
               ButtonSegment(value: LockType.password, label: Text('Password')),
-              ButtonSegment(value: LockType.pattern, label: Text('Pattern')),
             ],
             selected: {_type},
             onSelectionChanged: (s) => setState(() => _type = s.first),

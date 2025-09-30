@@ -137,7 +137,7 @@ class _SafeHomeScreenState extends State<SafeHomeScreen> with WidgetsBindingObse
       final File src = File(path);
       // if (!await src.exists()) continue;
       final File dst = File('${dest.path}${Platform.pathSeparator}${src.uri.pathSegments.last}');
-      await src.copy(dst.path);
+      await src.rename(dst.path);
     }
     if (mounted) {
       setState(() {

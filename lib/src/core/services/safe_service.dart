@@ -57,6 +57,9 @@ class SafeService {
     if (!await safeDir.exists()) {
       await safeDir.create(recursive: true);
     }
+    if (!await File('${safeDir.path}${Platform.pathSeparator}.nomedia').exists()) {
+      await File('${safeDir.path}${Platform.pathSeparator}.nomedia').create();
+    }
     if (sub != null) {
       final Directory subDir = Directory('${safeDir.path}${Platform.pathSeparator}$sub');
       if (!await subDir.exists()) {
