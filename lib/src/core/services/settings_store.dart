@@ -28,7 +28,6 @@ class SettingsStore {
   }
 
   static Future<void> setLockType(LockType type) => _secure.write(key: _kLockType, value: type.name);
-
   static Future<void> setPasscode(int safeId, String value) => _secure.write(key: safeId == 1 ? _kPass1 : _kPass2, value: value);
   static Future<String?> getPasscode(int safeId) => _secure.read(key: safeId == 1 ? _kPass1 : _kPass2);
 }
