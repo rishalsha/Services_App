@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:locker_app/src/features/video_player/video_player_screen.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:locker_app/src/core/services/safe_service.dart';
 import 'package:locker_app/src/features/safe_home/widgets/file_viewers.dart';
@@ -108,7 +109,7 @@ class _SafeHomeScreenState extends State<SafeHomeScreen> with WidgetsBindingObse
                         if (_isImage(p)) {
                           Navigator.of(context).push(MaterialPageRoute(builder: (_) => ImageViewer(file: entity)));
                         } else if (_isVideo(p)) {
-                          Navigator.of(context).push(MaterialPageRoute(builder: (_) => VideoViewer(file: entity)));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (_) => VideoPlayerScreen(file: entity,)));
                         } else if (_isAudio(p)) {
                           Navigator.of(context).push(MaterialPageRoute(builder: (_) => AudioPlayerScreen(file: entity)));
                         } else {
@@ -118,7 +119,7 @@ class _SafeHomeScreenState extends State<SafeHomeScreen> with WidgetsBindingObse
                     );
                   },
                 ),
-              ),
+              ), 
             ],
           );
         },
