@@ -74,6 +74,7 @@ class SafeService {
     final Directory dir = await safeDirectory(safeId);
     final List<FileSystemEntity> children = await dir.list(recursive: false).toList();
     children.sort((a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
+    children.removeWhere((element) => element.path.contains('.nomedia'));
     return children;
   }
 
