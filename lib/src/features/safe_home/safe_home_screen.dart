@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:locker_app/src/features/video_player/video_player_screen.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:locker_app/src/core/services/safe_service.dart';
-import 'package:locker_app/src/features/lockscreen/lock_screen.dart';
 import 'package:locker_app/src/features/safe_home/widgets/file_viewers.dart';
 import 'package:locker_app/src/features/settings/settings_screen.dart';
 
@@ -20,7 +20,6 @@ class SafeHomeScreen extends StatefulWidget {
 
 class _SafeHomeScreenState extends State<SafeHomeScreen> with WidgetsBindingObserver {
   late Future<List<FileSystemEntity>> _filesFuture;
-
   @override
   void initState() {
     super.initState();
@@ -34,18 +33,7 @@ class _SafeHomeScreenState extends State<SafeHomeScreen> with WidgetsBindingObse
     super.dispose();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
-      widget.onLock();
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => LockScreen(onUnlocked: (id) {
-              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => SafeHomeScreen(safeId: id, onLock: widget.onLock, safeService: widget.safeService)));
-            })),
-        (route) => false,
-      );
-    }
-  }
+
 
   bool _isImage(String path) => path.endsWith('.png') || path.endsWith('.jpg') || path.endsWith('.jpeg') || path.endsWith('.gif') || path.endsWith('.webp');
   bool _isVideo(String path) => path.endsWith('.mp4') || path.endsWith('.mkv') || path.endsWith('.mov') || path.endsWith('.webm');
@@ -121,7 +109,7 @@ class _SafeHomeScreenState extends State<SafeHomeScreen> with WidgetsBindingObse
                         if (_isImage(p)) {
                           Navigator.of(context).push(MaterialPageRoute(builder: (_) => ImageViewer(file: entity)));
                         } else if (_isVideo(p)) {
-                          Navigator.of(context).push(MaterialPageRoute(builder: (_) => VideoViewer(file: entity)));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (_) => VideoPlayerScreen(file: entity,)));
                         } else if (_isAudio(p)) {
                           Navigator.of(context).push(MaterialPageRoute(builder: (_) => AudioPlayerScreen(file: entity)));
                         } else {
@@ -131,7 +119,7 @@ class _SafeHomeScreenState extends State<SafeHomeScreen> with WidgetsBindingObse
                     );
                   },
                 ),
-              ),
+              ), 
             ],
           );
         },
@@ -147,9 +135,9 @@ class _SafeHomeScreenState extends State<SafeHomeScreen> with WidgetsBindingObse
       final String? path = file.path;
       if (path == null) continue;
       final File src = File(path);
-      if (!await src.exists()) continue;
+      // if (!await src.exists()) continue;
       final File dst = File('${dest.path}${Platform.pathSeparator}${src.uri.pathSegments.last}');
-      await src.copy(dst.path);
+      await src.rename(dst.path);
     }
     if (mounted) {
       setState(() {

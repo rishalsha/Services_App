@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:locker_app/src/core/services/safe_service.dart';
@@ -13,15 +12,18 @@ class ServicesApp extends StatefulWidget {
   State<ServicesApp> createState() => _ServicesAppState();
 }
 
-class _ServicesAppState extends State<ServicesApp> with WidgetsBindingObserver {
+class _ServicesAppState extends State<ServicesApp> with WidgetsBindingObserver, RouteAware {
   final ValueNotifier<bool> _isLocked = ValueNotifier<bool>(true);
   StreamSubscription? _shareStreamSub;
   final GlobalKey<NavigatorState> _navKey = GlobalKey<NavigatorState>();
   final SafeService _safeService = SafeService();
+  final RouteObserver<ModalRoute<void>> _routeObserver = RouteObserver<ModalRoute<void>>();
+  ModalRoute? _currentRoute;
 
   void _openSafe(int safeId) {
     _navKey.currentState!.pushReplacement(
       MaterialPageRoute(
+        settings: const RouteSettings(name: 'SafeHomeScreen'),
         builder: (_) => SafeHomeScreen(
           safeId: safeId,
           onLock: _goToLockScreen,
@@ -53,15 +55,18 @@ class _ServicesAppState extends State<ServicesApp> with WidgetsBindingObserver {
     _safeService.listenForShares();
   }
 
+
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _shareStreamSub?.cancel();
+    _routeObserver.unsubscribe(this);
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (_currentRoute?.settings.name == 'SafeHomeScreen') return;
     if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
       _isLocked.value = true; // Auto-lock on background
     }
@@ -73,7 +78,7 @@ class _ServicesAppState extends State<ServicesApp> with WidgetsBindingObserver {
       navigatorKey: _navKey,
       title: 'Services',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo, brightness: Brightness.dark),
         useMaterial3: true,
       ),
       home: ValueListenableBuilder<bool>(
