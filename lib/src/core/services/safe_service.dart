@@ -16,24 +16,6 @@ class SafeService {
     });
   }
 
-  Future<void> _saveSharedItems(List<String> paths) async {
-    if (paths.isEmpty) return;
-    final Directory base = await safeDirectory(1, sub: 'inbox');
-    for (final String p in paths) {
-      try {
-        final File src = File(p);
-        if (await src.exists()) {
-          final String fileName = src.uri.pathSegments.isNotEmpty ? src.uri.pathSegments.last : DateTime.now().millisecondsSinceEpoch.toString();
-          final File dst = File('${base.path}${Platform.pathSeparator}$fileName');
-          await src.copy(dst.path);
-          await src.delete();
-        }
-      } catch (e) {
-        print('Error in _saveSharedItems: $e');
-      }
-    }
-  }
-
   Future<void> _handleSharedUris(List<String> uris) async {
     if (uris.isEmpty) return;
     // Persist to Safe 1 inbox; content access still requires unlocking with passcode1
@@ -53,7 +35,7 @@ class SafeService {
           }
         }
       } catch (e) {
-        print('Error in _handleSharedUris: $e');
+        // TODO: Handle exception
       }
     }
   }

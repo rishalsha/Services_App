@@ -29,12 +29,12 @@ class _PinPadState extends State<PinPad> {
   }
 
   Widget _dot(bool filled) => Container(
-        width: 12,
-        height: 12,
-        margin: const EdgeInsets.symmetric(horizontal: 6),
+        width: 16,
+        height: 16,
+        margin: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
-          color: filled ? Colors.indigo : Colors.transparent,
-          border: Border.all(color: Colors.indigo, width: 2),
+          color: filled ? Theme.of(context).colorScheme.primary : Colors.transparent,
+          border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
           shape: BoxShape.circle,
         ),
       );
@@ -44,22 +44,22 @@ class _PinPadState extends State<PinPad> {
     final List<Widget> dots = List.generate(6, (i) => _dot(i < _pin.length));
     return Column(
       children: [
-        const SizedBox(height: 8),
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: dots),
         const SizedBox(height: 16),
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: dots),
+        const SizedBox(height: 32),
         _row(['1', '2', '3']),
-        const SizedBox(height: 8),
+        const SizedBox(height: 16),
         _row(['4', '5', '6']),
-        const SizedBox(height: 8),
+        const SizedBox(height: 16),
         _row(['7', '8', '9']),
-        const SizedBox(height: 8),
+        const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _key('⌫', onTap: _backspace),
-            const SizedBox(width: 8),
+            const SizedBox(width: 16),
             _key('0', onTap: () => _tap('0')),
-            const SizedBox(width: 8),
+            const SizedBox(width: 16),
             _key('✓', onTap: () => widget.onSubmit()),
           ],
         )
@@ -73,24 +73,25 @@ class _PinPadState extends State<PinPad> {
       children: [
         for (final l in labels) ...[
           _key(l, onTap: () => _tap(l)),
-          if (l != labels.last) const SizedBox(width: 8),
+          if (l != labels.last) const SizedBox(width: 16),
         ]
       ],
     );
   }
 
   Widget _key(String label, {required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 80,
-        height: 56,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.indigo, width: 2),
+    return SizedBox(
+      width: 80,
+      height: 80,
+      child: ElevatedButton(
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+          shape: const CircleBorder(),
+          padding: const EdgeInsets.all(20),
+          backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+          foregroundColor: Theme.of(context).colorScheme.onSecondaryContainer,
         ),
-        child: Text(label, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+        child: Text(label, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
       ),
     );
   }

@@ -11,7 +11,7 @@ class FileDeleter {
     final uriString = file.identifier;
 
     if (uriString == null) {
-      print("Error: The file identifier (URI) is null.");
+      // TODO: Handle exception
       return false;
     }
 
@@ -22,7 +22,7 @@ class FileDeleter {
       });
       return deleted;
     } on PlatformException catch (e) {
-      print("Failed to delete file: '${e.message}'.");
+      // TODO: Handle exception
       return false;
     }
   }

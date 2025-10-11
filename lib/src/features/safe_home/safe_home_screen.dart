@@ -9,6 +9,7 @@ import 'package:locker_app/src/core/services/safe_service.dart';
 import 'package:locker_app/src/features/safe_home/widgets/file_viewers.dart';
 import 'package:locker_app/src/features/settings/settings_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:locker_app/src/features/safe_home/widgets/video_thumbnail.dart';
 
 class SafeHomeScreen extends StatefulWidget {
   const SafeHomeScreen({
@@ -30,6 +31,8 @@ class _SafeHomeScreenState extends State<SafeHomeScreen>
   late Future<List<FileSystemEntity>> _filesFuture;
   bool _isSelectionMode = false;
   final Set<String> _selectedFiles = {};
+  bool _isGridView = false;
+
   @override
   void initState() {
     super.initState();
@@ -147,6 +150,15 @@ class _SafeHomeScreenState extends State<SafeHomeScreen>
                 ),
               ]
             : [
+                if (widget.safeId == 2)
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _isGridView = !_isGridView;
+                      });
+                    },
+                    icon: Icon(_isGridView ? Icons.list : Icons.grid_view),
+                  ),
                 IconButton(
                   onPressed: _importFiles,
                   icon: const Icon(Icons.add),
@@ -189,75 +201,134 @@ class _SafeHomeScreenState extends State<SafeHomeScreen>
           }
           final files = snapshot.data!;
           if (files.isEmpty) {
-            return const Center(
-              child: Text('No files yet. Use Android Share to add to Safe 1.'),
-            );
+            return const Center(child: Text('Empty'));
           }
-          return Column(
-            children: [
-              const Divider(height: 1),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: files.length,
-                  itemBuilder: (context, index) {
-                    final entity = files[index];
-                    if (entity is! File) {
-                      return ListTile(
-                        title: Text(entity.uri.pathSegments.last),
-                      );
-                    }
-                    final String name = entity.uri.pathSegments.last;
-                    final String p = entity.path.toLowerCase();
-                    IconData icon = Icons.insert_drive_file;
-                    if (_isImage(p)) icon = Icons.image;
-                    if (_isVideo(p)) icon = Icons.movie;
-                    if (_isAudio(p)) icon = Icons.audiotrack;
-                    return ListTile(
-                      leading: Icon(icon),
-                      title: Text(name),
-                      selected: _selectedFiles.contains(entity.path),
-                      selectedTileColor: Theme.of(
-                        context,
-                      ).colorScheme.primaryContainer,
-                      onTap: _isSelectionMode
-                          ? () => _toggleFileSelection(entity.path)
-                          : () async {
-                              if (_isImage(p)) {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) => ImageViewer(file: entity),
-                                  ),
-                                );
-                              } else if (_isVideo(p)) {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        VideoPlayerScreen(file: entity),
-                                  ),
-                                );
-                              } else if (_isAudio(p)) {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        AudioPlayerScreen(file: entity),
-                                  ),
-                                );
-                              } else {
-                                await OpenFilex.open(entity.path);
-                              }
-                            },
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
+          return _isGridView ? _buildGridView(files) : _buildListView(files);
         },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _importFiles,
         child: const Icon(Icons.add),
       ),
+    );
+  }
+
+  Widget _buildListView(List<FileSystemEntity> files) {
+    return ListView.builder(
+      itemCount: files.length,
+      itemBuilder: (context, index) {
+        final entity = files[index];
+        if (entity is! File) {
+          return ListTile(
+            title: Text(entity.uri.pathSegments.last),
+          );
+        }
+        final String name = entity.uri.pathSegments.last;
+        final String p = entity.path.toLowerCase();
+        IconData icon = Icons.insert_drive_file;
+        if (_isImage(p)) icon = Icons.image;
+        if (_isVideo(p)) icon = Icons.movie;
+        if (_isAudio(p)) icon = Icons.audiotrack;
+        return ListTile(
+          leading: Icon(icon),
+          title: Text(name),
+          selected: _selectedFiles.contains(entity.path),
+          selectedTileColor: Theme.of(
+            context,
+          ).colorScheme.primaryContainer,
+          onTap: _isSelectionMode
+              ? () => _toggleFileSelection(entity.path)
+              : () async {
+                  if (_isImage(p)) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => ImageViewer(file: entity),
+                      ),
+                    );
+                  } else if (_isVideo(p)) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            VideoPlayerScreen(file: entity),
+                      ),
+                    );
+                  } else if (_isAudio(p)) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            AudioPlayerScreen(file: entity),
+                      ),
+                    );
+                  } else {
+                    await OpenFilex.open(entity.path);
+                  }
+                },
+        );
+      },
+    );
+  }
+
+  Widget _buildGridView(List<FileSystemEntity> files) {
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 4,
+        mainAxisSpacing: 4,
+      ),
+      itemCount: files.length,
+      itemBuilder: (context, index) {
+        final entity = files[index];
+        if (entity is! File) {
+          return Card(
+            child: Center(
+              child: Text(entity.uri.pathSegments.last),
+            ),
+          );
+        }
+        final String name = entity.uri.pathSegments.last;
+        final String p = entity.path.toLowerCase();
+        return Card(
+          child: InkWell(
+            onTap: () async {
+              if (_isImage(p)) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ImageViewer(file: entity),
+                  ),
+                );
+              } else if (_isVideo(p)) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        VideoPlayerScreen(file: entity),
+                  ),
+                );
+              } else if (_isAudio(p)) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        AudioPlayerScreen(file: entity),
+                  ),
+                );
+              } else {
+                await OpenFilex.open(entity.path);
+              }
+            },
+            child: Column(
+              children: [
+                Expanded(
+                  child: _isImage(p)
+                      ? Image.file(entity, fit: BoxFit.cover)
+                      : _isVideo(p)
+                          ? VideoThumbnailWidget(videoPath: entity.path)
+                          : Icon(Icons.audiotrack, size: 48),
+                ),
+                Text(name, maxLines: 1, overflow: TextOverflow.ellipsis),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -285,7 +356,6 @@ class _SafeHomeScreenState extends State<SafeHomeScreen>
       );
       await dst.writeAsBytes(await src.readAsBytes());
       await FileDeleter.deleteOriginalFile(file);
-
     }
     if (mounted) {
       setState(() {

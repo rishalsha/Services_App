@@ -1,13 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class EncryptionService {
   static const FlutterSecureStorage _secure = FlutterSecureStorage();
   static const String _keyStorageKey = 'encryption_key';
-  static const int _keySize = 32; // 256 bits
   static const int _nonceSize = 12; // 96 bits for ChaCha20
 
   /// Get or generate encryption key for a specific safe
@@ -21,7 +19,7 @@ class EncryptionService {
     }
 
     // Generate new key
-    final algorithm = Chacha20.poly1305Aead;
+    final algorithm = Chacha20.poly1305Aead();
     final newKey = await algorithm.newSecretKey();
     final keyBytes = await newKey.extractBytes();
     await _secure.write(key: keyName, value: base64Encode(keyBytes));
@@ -32,7 +30,7 @@ class EncryptionService {
   static Future<List<int>> encryptFile(List<int> fileContent, int safeId) async {
     try {
       final key = await _getOrGenerateKey(safeId);
-      final algorithm = Chacha20.poly1305Aead;
+      final algorithm = Chacha20.poly1305Aead();
 
       // Encrypt the file
       final secretBox = await algorithm.encrypt(
@@ -50,7 +48,7 @@ class EncryptionService {
   static Future<List<int>> decryptFile(List<int> encryptedData, int safeId) async {
     try {
       final key = await _getOrGenerateKey(safeId);
-      final algorithm = Chacha20.poly1305Aead;
+      final algorithm = Chacha20.poly1305Aead();
 
       final secretBox = SecretBox.fromConcatenation(
         encryptedData,
