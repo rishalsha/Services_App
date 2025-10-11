@@ -1,6 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-enum LockType { pin, password, pattern }
+enum LockType { pin, password }
 
 class SettingsStore {
   static FlutterSecureStorage _secure = const FlutterSecureStorage();
@@ -19,8 +19,6 @@ class SettingsStore {
     switch (v) {
       case 'pin':
         return LockType.pin;
-      case 'pattern':
-        return LockType.pattern;
       case 'password':
       default:
         return LockType.password;

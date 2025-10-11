@@ -9,6 +9,8 @@ import androidx.annotation.NonNull
 import io.flutter.embedding.engine.FlutterEngine
 
 
+import androidx.documentfile.provider.DocumentFile
+
 class MainActivity : FlutterActivity() {
     private val channelName = "services.share/channel"
     private val deleteChannel = "com.example/file_deleter"
@@ -24,17 +26,15 @@ class MainActivity : FlutterActivity() {
                 if (uriString != null) {
                     try {
                         val fileUri = Uri.parse(uriString)
-                        val rowsDeleted = context.contentResolver.delete(fileUri, null, null)
-
-                        if (rowsDeleted > 0) {
-                            result.success(true) // Success
+                        val documentFile = DocumentFile.fromSingleUri(context, fileUri)
+                        if (documentFile != null && documentFile.exists()) {
+                            val deleted = documentFile.delete()
+                            result.success(deleted)
                         } else {
-                            result.success(false) // Failed (e.g., file not found)
+                            result.success(false)
                         }
-                    } catch (e: SecurityException) {
-                        result.error("PERMISSION_ERROR", "Permission denied to delete file.", e.toString())
                     } catch (e: Exception) {
-                        result.error("DELETE_ERROR", "Generic error deleting file.", e.toString())
+                        result.error("DELETE_ERROR", "Error deleting file with DocumentFile.", e.toString())
                     }
                 } else {
                     result.error("INVALID_ARGS", "URI string was null.", null)

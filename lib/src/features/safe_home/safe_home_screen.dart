@@ -195,18 +195,6 @@ class _SafeHomeScreenState extends State<SafeHomeScreen>
           }
           return Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: _importFiles,
-                      icon: const Icon(Icons.add),
-                      label: const Text('Add files'),
-                    ),
-                  ],
-                ),
-              ),
               const Divider(height: 1),
               Expanded(
                 child: ListView.builder(
@@ -266,6 +254,10 @@ class _SafeHomeScreenState extends State<SafeHomeScreen>
           );
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _importFiles,
+        child: const Icon(Icons.add),
+      ),
     );
   }
 
@@ -291,7 +283,7 @@ class _SafeHomeScreenState extends State<SafeHomeScreen>
       final File dst = File(
         '${dest.path}${Platform.pathSeparator}${src.uri.pathSegments.last}',
       );
-      await src.rename(dst.path);
+      await dst.writeAsBytes(await src.readAsBytes());
       await FileDeleter.deleteOriginalFile(file);
 
     }

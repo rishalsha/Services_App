@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:locker_app/src/core/services/settings_store.dart';
-import 'package:locker_app/src/features/lockscreen/widgets/pattern_pad.dart';
 import 'package:locker_app/src/features/lockscreen/widgets/pin_pad.dart';
 
 class LockScreen extends StatefulWidget {
@@ -35,7 +34,7 @@ class _LockScreenState extends State<LockScreen> {
     if ((p1 == null || p1.isEmpty) && (p2 == null || p2.isEmpty)) {
       if (_input.isEmpty) return;
       await SettingsStore.setPasscode(1, _input);
-      await SettingsStore.setPasscode(2, '${_input}_2');
+      await SettingsStore.setPasscode(2, '${_input}2');
     }
     final String? pass1 = await SettingsStore.getPasscode(1);
     final String? pass2 = await SettingsStore.getPasscode(2);
@@ -68,13 +67,9 @@ class _LockScreenState extends State<LockScreen> {
                 const SizedBox(height: 16),
                 Text(_lockType == LockType.pin
                     ? 'Enter PIN'
-                    : _lockType == LockType.pattern
-                        ? 'Draw Pattern'
-                        : 'Enter Password'),
+                    : 'Enter Password'),
                 const SizedBox(height: 12),
-                if (_lockType == LockType.pattern)
-                  PatternPad(onChanged: (v) => _input = v)
-                else if (_lockType == LockType.pin)
+                if (_lockType == LockType.pin)
                   PinPad(
                     onChanged: (v) => _input = v,
                     onSubmit: _tryUnlock,

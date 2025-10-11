@@ -26,8 +26,11 @@ class SafeService {
           final String fileName = src.uri.pathSegments.isNotEmpty ? src.uri.pathSegments.last : DateTime.now().millisecondsSinceEpoch.toString();
           final File dst = File('${base.path}${Platform.pathSeparator}$fileName');
           await src.copy(dst.path);
+          await src.delete();
         }
-      } catch (_) {}
+      } catch (e) {
+        print('Error in _saveSharedItems: $e');
+      }
     }
   }
 
@@ -45,9 +48,13 @@ class SafeService {
           if (await src.exists()) {
             final File dst = File('${base.path}${Platform.pathSeparator}${src.uri.pathSegments.last}');
             await src.copy(dst.path);
+            await src.delete();
+    
           }
         }
-      } catch (_) {}
+      } catch (e) {
+        print('Error in _handleSharedUris: $e');
+      }
     }
   }
 
