@@ -150,7 +150,7 @@ class _SafeHomeScreenState extends State<SafeHomeScreen>
                 ),
               ]
             : [
-                if (widget.safeId == 2)
+                if (widget.safeId == 1)
                   IconButton(
                     onPressed: () {
                       setState(() {
